@@ -22,23 +22,23 @@ export default function Footer() {
               <h3 className="text-[hsl(var(--primary))] font-bold mb-3">Site Map</h3>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link href="/">
-                    <a className="hover:text-[hsl(var(--primary))] transition-colors">Home</a>
+                  <Link href="/" className="hover:text-[hsl(var(--primary))] transition-colors">
+                    Home
                   </Link>
                 </li>
                 <li>
-                  <Link href="/about">
-                    <a className="hover:text-[hsl(var(--primary))] transition-colors">About</a>
+                  <Link href="/about" className="hover:text-[hsl(var(--primary))] transition-colors">
+                    About
                   </Link>
                 </li>
                 <li>
-                  <Link href="/resources">
-                    <a className="hover:text-[hsl(var(--primary))] transition-colors">Resources</a>
+                  <Link href="/resources" className="hover:text-[hsl(var(--primary))] transition-colors">
+                    Resources
                   </Link>
                 </li>
                 <li>
-                  <Link href="/donate">
-                    <a className="hover:text-[hsl(var(--primary))] transition-colors">Donate</a>
+                  <Link href="/donate" className="hover:text-[hsl(var(--primary))] transition-colors">
+                    Donate
                   </Link>
                 </li>
               </ul>
