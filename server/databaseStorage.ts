@@ -176,7 +176,7 @@ export class DatabaseStorage implements IStorage {
         {
           name: "ChatGPT Premium Access",
           description: "Superfishal Intelligence offering: Enhanced version of OpenAI's conversational AI assistant with priority access and additional features. $29.99/month (save with annual subscription)",
-          url: "https://chat.openai.com",
+          url: "https://chat.openai.com?ref=superfishalintelligence&aff=si2025",
           category: "Large Language Models",
           tags: ["ai", "conversation", "text", "premium"],
           isFeatured: true,
@@ -186,7 +186,7 @@ export class DatabaseStorage implements IStorage {
         {
           name: "Claude Pro Enterprise",
           description: "Superfishal Intelligence offering: Advanced version of Anthropic's helpful assistant with expanded capabilities and priority access. $34.99/month (industry rate)",
-          url: "https://claude.ai",
+          url: "https://claude.ai?partner=superfishal&promocode=INTEL2025",
           category: "Large Language Models",
           tags: ["ai", "conversation", "text", "enterprise"],
           isFeatured: false,
@@ -196,7 +196,7 @@ export class DatabaseStorage implements IStorage {
         {
           name: "Hugging Face Enterprise Solutions",
           description: "Superfishal Intelligence offering: Premium access to thousands of open-source models with enhanced features and dedicated support. Starting at $99/month for businesses",
-          url: "https://huggingface.co",
+          url: "https://huggingface.co?affiliate=superfishalintelligence&campaign=enterprise",
           category: "Hugging Face Models",
           tags: ["models", "open-source", "nlp", "enterprise"],
           isFeatured: true,
@@ -206,7 +206,7 @@ export class DatabaseStorage implements IStorage {
         {
           name: "Firebase Pro Hosting",
           description: "Superfishal Intelligence offering: Enhanced Firebase hosting with expanded storage, bandwidth, and premium support. $49.99/month for growing businesses",
-          url: "https://firebase.google.com/products/hosting",
+          url: "https://firebase.google.com/products/hosting?referral=superfishalintelligence&afftrack=premiumhosting",
           category: "Premium Hosting Services",
           tags: ["hosting", "premium", "web"],
           isFeatured: true,
@@ -216,7 +216,7 @@ export class DatabaseStorage implements IStorage {
         {
           name: "TensorFlow.js Pro Suite",
           description: "Superfishal Intelligence offering: Enhanced TensorFlow.js package with optimized models, premium support, and technical consultation. $79.99/month for developers",
-          url: "https://www.tensorflow.org/js",
+          url: "https://www.tensorflow.org/js?aff=superfishal&utm_source=intelligence_portal&utm_medium=affiliate",
           category: "Premium API Integration",
           tags: ["machine learning", "javascript", "browser", "premium"],
           isFeatured: true,
@@ -226,7 +226,7 @@ export class DatabaseStorage implements IStorage {
         {
           name: "Gemini Advanced Business",
           description: "Superfishal Intelligence offering: Enhanced version of Google's multimodal AI with industry-specific optimizations. $39.99/month (competitive industry rate)",
-          url: "https://gemini.google.com",
+          url: "https://gemini.google.com?partner=superfishalintelligence&discount=PREMIUM25",
           category: "Large Language Models",
           tags: ["ai", "google", "multimodal", "premium"],
           isFeatured: false,
@@ -236,7 +236,7 @@ export class DatabaseStorage implements IStorage {
         {
           name: "GitHub Pages Professional",
           description: "Superfishal Intelligence offering: Enhanced GitHub Pages with premium templates, advanced analytics, and priority support. $24.99/month for professionals",
-          url: "https://pages.github.com",
+          url: "https://pages.github.com?ref=superfishalintelligence&afftrack=premium-gh-pages",
           category: "Premium Hosting Services",
           tags: ["hosting", "premium", "static"],
           isFeatured: false,

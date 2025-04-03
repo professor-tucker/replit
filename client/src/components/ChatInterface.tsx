@@ -44,18 +44,11 @@ export default function ChatInterface({ showResourceCards = false }: ChatInterfa
   const displayMessages = messages.length > 0 ? messages : [defaultMessage];
 
   return (
-    <div className="flex-grow flex flex-col max-w-4xl mx-auto w-full px-4 py-6 md:py-8">
-      {/* Welcome Message */}
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold mb-4">Welcome to <span className="text-[hsl(var(--primary))]">Superfishal Intelligence</span></h1>
-        <p className="text-[hsl(var(--muted-foreground))] mb-2">Discover and use free AI resources for your projects</p>
-        <p className="text-[hsl(var(--muted-foreground))]">Ask questions about AI tools, get code examples, or explore free hosting options</p>
-      </div>
-      
+    <div className="flex-grow flex flex-col w-full">
       {/* Chat Messages Container */}
-      <div className="flex-grow overflow-y-auto mb-6 space-y-6">
+      <div className="flex-grow overflow-y-auto mb-4 space-y-4 border border-[hsl(var(--muted))] rounded-md p-4 min-h-[300px] max-h-[400px]">
         {displayMessages.map((message) => (
-          <div key={message.id} className="flex items-start space-x-4">
+          <div key={message.id} className="flex items-start space-x-3">
             <Avatar className={message.role === 'assistant' ? 'bg-[hsl(var(--primary))]' : 'bg-[hsl(var(--muted))]'}>
               {message.role === 'assistant' ? (
                 <AvatarFallback className="text-black font-bold text-sm">SI</AvatarFallback>
@@ -68,10 +61,10 @@ export default function ChatInterface({ showResourceCards = false }: ChatInterfa
               )}
             </Avatar>
             <div className="flex-grow">
-              <p className="text-[hsl(var(--primary))] font-medium mb-1">
-                {message.role === 'assistant' ? 'Assistant' : 'You'}
+              <p className="text-[hsl(var(--primary))] font-medium mb-1 text-sm">
+                {message.role === 'assistant' ? 'Superfishal Intelligence' : 'You'}
               </p>
-              <div className="prose text-[hsl(var(--foreground))]">
+              <div className="prose prose-sm text-[hsl(var(--foreground))]">
                 <p>{message.content}</p>
               </div>
             </div>
@@ -80,13 +73,13 @@ export default function ChatInterface({ showResourceCards = false }: ChatInterfa
         
         {/* Loading indicator */}
         {isLoading && (
-          <div className="flex items-start space-x-4">
+          <div className="flex items-start space-x-3">
             <Avatar className="bg-[hsl(var(--primary))]">
               <AvatarFallback className="text-black font-bold text-sm">SI</AvatarFallback>
             </Avatar>
             <div className="flex-grow">
-              <p className="text-[hsl(var(--primary))] font-medium mb-1">Assistant</p>
-              <div className="prose text-[hsl(var(--foreground))]">
+              <p className="text-[hsl(var(--primary))] font-medium mb-1 text-sm">Superfishal Intelligence</p>
+              <div className="prose prose-sm text-[hsl(var(--foreground))]">
                 <p>Typing<span className="typing-dot">.</span><span className="typing-dot">.</span><span className="typing-dot">.</span></p>
               </div>
             </div>
@@ -104,18 +97,6 @@ export default function ChatInterface({ showResourceCards = false }: ChatInterfa
         onKeyDown={handleKeyDown}
         isSubmitting={isLoading}
       />
-      
-      {/* Resource Cards */}
-      {showResourceCards && (
-        <div className="mt-8 space-y-4">
-          <h2 className="text-xl font-bold text-[hsl(var(--primary))]">Featured Resources</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {featuredResources.map(resource => (
-              <ResourceCard key={resource.id} resource={resource} />
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
