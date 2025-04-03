@@ -5,6 +5,7 @@ import { DollarSign, ArrowUpRight } from 'lucide-react';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import ChatInterface from '@/components/ChatInterface';
+import SecurityTrends from '@/components/SecurityTrends';
 import Footer from '@/components/Footer';
 import MobileDrawer from '@/components/MobileDrawer';
 import { useSidebar } from '@/lib/hooks/useSidebar';
@@ -47,6 +48,9 @@ export default function Home() {
           
           {/* Chat interface */}
           <ChatInterface showResourceCards={false} />
+          
+          {/* Security Trends Component */}
+          <SecurityTrends />
           
           {/* CENTERED Donate button/CTA */}
           <div className="my-12 flex justify-center">

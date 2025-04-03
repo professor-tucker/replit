@@ -67,3 +67,27 @@ export const insertResourceCategorySchema = createInsertSchema(resourceCategorie
 
 export type InsertResourceCategory = z.infer<typeof insertResourceCategorySchema>;
 export type ResourceCategory = typeof resourceCategories.$inferSelect;
+
+// Generated content for YouTube and marketing
+export const generatedContent = pgTable("generated_content", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  summary: text("summary").notNull(),
+  keyPoints: text("key_points").array().notNull(),
+  youtubeScriptIdea: text("youtube_script_idea").notNull(),
+  fullContent: text("full_content"), // Optional full content
+  category: text("category").notNull(), // Can be 'cybersecurity', 'ai', etc.
+  tags: text("tags").array().notNull(),
+  isFeatured: boolean("is_featured").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  youtubeUrl: text("youtube_url"), // For when we create YouTube videos
+  relatedResourceIds: integer("related_resource_ids").array(), // To link to resources
+});
+
+export const insertGeneratedContentSchema = createInsertSchema(generatedContent).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertGeneratedContent = z.infer<typeof insertGeneratedContentSchema>;
+export type GeneratedContent = typeof generatedContent.$inferSelect;

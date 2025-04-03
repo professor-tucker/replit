@@ -3,6 +3,7 @@ import {
   resources, 
   chatMessages, 
   resourceCategories,
+  generatedContent,
   type User, 
   type InsertUser,
   type Resource,
@@ -10,10 +11,12 @@ import {
   type ChatMessage,
   type InsertChatMessage,
   type ResourceCategory,
-  type InsertResourceCategory
+  type InsertResourceCategory,
+  type GeneratedContent,
+  type InsertGeneratedContent
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, like, sql, desc, asc } from "drizzle-orm";
+import { eq, like, sql, desc, asc, inArray } from "drizzle-orm";
 import { IStorage } from "./storage";
 
 export class DatabaseStorage implements IStorage {
@@ -147,6 +150,104 @@ export class DatabaseStorage implements IStorage {
       .values(insertCategory)
       .returning();
     return category;
+  }
+  
+  // Generated content operations
+  async getAllGeneratedContent(limit = 20): Promise<GeneratedContent[]> {
+    return await db
+      .select()
+      .from(generatedContent)
+      .orderBy(desc(generatedContent.createdAt))
+      .limit(limit);
+  }
+  
+  async getGeneratedContentById(id: number): Promise<GeneratedContent | undefined> {
+    const [content] = await db
+      .select()
+      .from(generatedContent)
+      .where(eq(generatedContent.id, id));
+    return content;
+  }
+  
+  async getGeneratedContentByCategory(category: string, limit = 10): Promise<GeneratedContent[]> {
+    return await db
+      .select()
+      .from(generatedContent)
+      .where(eq(generatedContent.category, category))
+      .orderBy(desc(generatedContent.createdAt))
+      .limit(limit);
+  }
+  
+  async getFeaturedGeneratedContent(limit = 5): Promise<GeneratedContent[]> {
+    return await db
+      .select()
+      .from(generatedContent)
+      .where(eq(generatedContent.isFeatured, true))
+      .orderBy(desc(generatedContent.createdAt))
+      .limit(limit);
+  }
+  
+  async getGeneratedContentByTags(tags: string[], limit = 10): Promise<GeneratedContent[]> {
+    // This is a simple implementation that checks if any tag matches
+    // Could be enhanced with more sophisticated tag matching
+    return await db
+      .select()
+      .from(generatedContent)
+      .where(sql`exists (select 1 from unnest(${generatedContent.tags}) tag where tag = ANY(ARRAY[${tags}]))`)
+      .orderBy(desc(generatedContent.createdAt))
+      .limit(limit);
+  }
+  
+  async getRelatedGeneratedContent(resourceIds: number[], limit = 3): Promise<GeneratedContent[]> {
+    // Find content related to specific resources by their IDs
+    return await db
+      .select()
+      .from(generatedContent)
+      .where(sql`exists (select 1 from unnest(${generatedContent.relatedResourceIds}) id where id = ANY(ARRAY[${resourceIds}]))`)
+      .orderBy(desc(generatedContent.createdAt))
+      .limit(limit);
+  }
+  
+  async searchGeneratedContent(query: string): Promise<GeneratedContent[]> {
+    const lowercaseQuery = query.toLowerCase();
+    return await db
+      .select()
+      .from(generatedContent)
+      .where(
+        sql`lower(${generatedContent.title}) like ${`%${lowercaseQuery}%`} or 
+            lower(${generatedContent.summary}) like ${`%${lowercaseQuery}%`} or
+            lower(${generatedContent.youtubeScriptIdea}) like ${`%${lowercaseQuery}%`}`)
+      .orderBy(desc(generatedContent.createdAt));
+  }
+  
+  async createGeneratedContent(insertContent: InsertGeneratedContent): Promise<GeneratedContent> {
+    const [content] = await db
+      .insert(generatedContent)
+      .values({
+        ...insertContent,
+        relatedResourceIds: insertContent.relatedResourceIds || [],
+        isFeatured: insertContent.isFeatured || false,
+        youtubeUrl: insertContent.youtubeUrl || null,
+        fullContent: insertContent.fullContent || null
+      })
+      .returning();
+    return content;
+  }
+  
+  async updateGeneratedContent(id: number, contentUpdate: Partial<InsertGeneratedContent>): Promise<GeneratedContent | undefined> {
+    const [updatedContent] = await db
+      .update(generatedContent)
+      .set(contentUpdate)
+      .where(eq(generatedContent.id, id))
+      .returning();
+    return updatedContent;
+  }
+  
+  async deleteGeneratedContent(id: number): Promise<boolean> {
+    const result = await db
+      .delete(generatedContent)
+      .where(eq(generatedContent.id, id));
+    return !!result;
   }
 
   // Initialize database with default data

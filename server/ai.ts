@@ -1,5 +1,6 @@
 import { HfInference } from '@huggingface/inference';
 import axios from 'axios';
+import { generateSecurityTrendWithClaude, generateYouTubeScript } from './anthropic';
 
 // Initialize the Hugging Face client
 let hf: HfInference | null = null;
@@ -70,6 +71,24 @@ export async function generateSecurityTrendContent(topic?: string): Promise<{
   keyPoints: string[];
   youtubeScriptIdea: string;
 }> {
+  // First, try to use Claude if the API key is available
+  if (process.env.ANTHROPIC_API_KEY) {
+    try {
+      console.log("Using Anthropic Claude for security trend generation");
+      const claudeResponse = await generateSecurityTrendWithClaude(topic);
+      return {
+        title: claudeResponse.title,
+        summary: claudeResponse.summary,
+        keyPoints: claudeResponse.keyPoints,
+        youtubeScriptIdea: claudeResponse.youtubeScriptIdea
+      };
+    } catch (claudeError) {
+      console.error("Claude API error, falling back to Hugging Face:", claudeError);
+      // Continue to fallback method if Claude fails
+    }
+  }
+  
+  // Fallback to Hugging Face if Claude is not available or fails
   try {
     const hfClient = getHfClient();
     

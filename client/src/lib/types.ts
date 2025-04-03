@@ -31,6 +31,21 @@ export interface ResourceCategory {
   description: string;
 }
 
+export interface GeneratedContent {
+  id: number;
+  title: string;
+  summary: string;
+  keyPoints: string[];
+  youtubeScriptIdea: string;
+  fullContent: string | null;
+  category: string;
+  tags: string[];
+  isFeatured: boolean;
+  createdAt: string;
+  youtubeUrl: string | null;
+  relatedResourceIds: number[] | null;
+}
+
 // UI types
 export interface ChatSession {
   messages: ChatMessage[];

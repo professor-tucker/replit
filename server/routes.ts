@@ -5,11 +5,18 @@ import {
   insertResourceSchema, 
   insertChatMessageSchema, 
   insertResourceCategorySchema,
+  insertGeneratedContentSchema,
   resources,
   chatMessages,
-  resourceCategories 
+  resourceCategories,
+  generatedContent 
 } from "@shared/schema";
-import { generateAIResponse, formatChatPrompt } from "./ai";
+import { 
+  generateAIResponse, 
+  formatChatPrompt, 
+  generateSecurityTrendContent,
+  generateWithPerplexity 
+} from "./ai";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { db } from "./db";
@@ -216,6 +223,141 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Generated content endpoints
+  apiRouter.get("/api/content", async (req: Request, res: Response) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const content = await storage.getAllGeneratedContent(limit);
+      res.json(content);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch generated content" });
+    }
+  });
+  
+  apiRouter.get("/api/content/featured", async (req: Request, res: Response) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const content = await storage.getFeaturedGeneratedContent(limit);
+      res.json(content);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch featured content" });
+    }
+  });
+  
+  apiRouter.get("/api/content/category/:category", async (req: Request, res: Response) => {
+    try {
+      const category = req.params.category;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const content = await storage.getGeneratedContentByCategory(category, limit);
+      res.json(content);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch content by category" });
+    }
+  });
+  
+  apiRouter.get("/api/content/search", async (req: Request, res: Response) => {
+    try {
+      const query = req.query.q as string;
+      if (!query) {
+        return res.status(400).json({ message: "Search query is required" });
+      }
+      const content = await storage.searchGeneratedContent(query);
+      res.json(content);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to search content" });
+    }
+  });
+  
+  apiRouter.get("/api/content/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid content ID" });
+      }
+      
+      const content = await storage.getGeneratedContentById(id);
+      if (!content) {
+        return res.status(404).json({ message: "Content not found" });
+      }
+      
+      res.json(content);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch content" });
+    }
+  });
+  
+  apiRouter.post("/api/content/generate", async (req: Request, res: Response) => {
+    try {
+      const { topic } = req.body;
+      
+      // Generate content using the AI service
+      const generatedData = await generateSecurityTrendContent(topic);
+      
+      // Prepare data for database storage
+      const contentData = {
+        title: generatedData.title,
+        summary: generatedData.summary,
+        keyPoints: generatedData.keyPoints,
+        youtubeScriptIdea: generatedData.youtubeScriptIdea,
+        category: "cybersecurity",
+        tags: ["security", "trends", "youtube"],
+        fullContent: generatedData.keyPoints.join('\n\n'),
+        isFeatured: false,
+        relatedResourceIds: [],
+        youtubeUrl: null
+      };
+      
+      // Validate the data
+      const validatedData = insertGeneratedContentSchema.safeParse(contentData);
+      
+      if (!validatedData.success) {
+        const errorMessage = fromZodError(validatedData.error).message;
+        return res.status(400).json({ message: errorMessage });
+      }
+      
+      // Store in database
+      const newContent = await storage.createGeneratedContent(validatedData.data);
+      res.status(201).json(newContent);
+    } catch (error) {
+      console.error("Content generation error:", error);
+      res.status(500).json({ message: "Failed to generate content" });
+    }
+  });
+  
+  apiRouter.post("/api/content", async (req: Request, res: Response) => {
+    try {
+      const validatedData = insertGeneratedContentSchema.safeParse(req.body);
+      
+      if (!validatedData.success) {
+        const errorMessage = fromZodError(validatedData.error).message;
+        return res.status(400).json({ message: errorMessage });
+      }
+      
+      const newContent = await storage.createGeneratedContent(validatedData.data);
+      res.status(201).json(newContent);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create content" });
+    }
+  });
+  
+  apiRouter.delete("/api/content/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid content ID" });
+      }
+      
+      const success = await storage.deleteGeneratedContent(id);
+      if (!success) {
+        return res.status(404).json({ message: "Content not found" });
+      }
+      
+      res.json({ message: "Content deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete content" });
+    }
+  });
+  
   // Database reset endpoint (for development purposes)
   apiRouter.post("/api/reset-database", async (req: Request, res: Response) => {
     try {
@@ -223,6 +365,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await db.delete(chatMessages);
       await db.delete(resources);
       await db.delete(resourceCategories);
+      await db.delete(generatedContent);
       
       // Reinitialize with default data
       await storage.initializeDefaultData();
