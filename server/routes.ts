@@ -116,41 +116,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if this is a user message that needs an AI response
       if (validatedData.data.role === 'user') {
         // Get previous messages for context
-        const previousMessages = await storage.getChatMessagesByUserId(validatedData.data.userId);
+        const previousMessages = await storage.getChatMessagesByUserId(validatedData.data.userId || null);
         
-        // In a production environment, we would call an AI API like OpenAI here
-        // Example pseudocode for OpenAI integration:
-        /*
-        const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-          },
-          body: JSON.stringify({
-            model: 'gpt-4',
-            messages: [
-              { role: 'system', content: 'You are an AI resource guide at Superfishal Intelligence, a platform that helps users discover free AI tools, get code examples, and find hosting options.' },
-              ...previousMessages.map(msg => ({ 
-                role: msg.role, 
-                content: msg.content 
-              })),
-              { role: 'user', content: validatedData.data.content }
-            ],
-            temperature: 0.7
-          })
-        }).then(res => res.json());
+        // Convert messages to format needed for prompt
+        const formattedMessages = previousMessages.map(msg => ({
+          role: msg.role,
+          content: msg.content
+        }));
         
-        const aiResponseContent = openaiResponse.choices[0].message.content;
-        */
+        // Add the current message
+        formattedMessages.push({
+          role: 'user',
+          content: validatedData.data.content
+        });
         
-        // For now, use a static response as a placeholder
-        const aiResponseContent = "I'm your AI resource guide at Superfishal Intelligence. I can help you discover free AI tools, provide code examples, and recommend hosting options based on your needs.";
+        // Format the prompt for the AI model
+        const prompt = formatChatPrompt(formattedMessages);
+        
+        // Generate response from Hugging Face
+        const aiResponseContent = await generateAIResponse(prompt);
+        
+        // Clean the response (remove leading prompt if it appears in the response)
+        const cleanedResponse = aiResponseContent.replace(/^Assistant:\s*/i, '');
         
         // Save the AI response to the database
         const assistantMessage = await storage.createChatMessage({
           userId: validatedData.data.userId,
-          content: aiResponseContent,
+          content: cleanedResponse,
           role: 'assistant'
         });
         

@@ -38,6 +38,9 @@ export interface IStorage {
   getAllCategories(): Promise<ResourceCategory[]>;
   getCategoryById(id: number): Promise<ResourceCategory | undefined>;
   createCategory(category: InsertResourceCategory): Promise<ResourceCategory>;
+  
+  // Database initialization
+  initializeDefaultData(): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -64,88 +67,88 @@ export class MemStorage implements IStorage {
     this.initializeDefaultData();
   }
 
-  private initializeDefaultData() {
-    // Add default categories
+  async initializeDefaultData(): Promise<void> {
+    // Add default categories with premium positioning
     const defaultCategories = [
-      { name: "Large Language Models", description: "AI models specialized in understanding and generating human language" },
-      { name: "Data Analytics Tools", description: "Tools and platforms for analyzing and visualizing data" },
-      { name: "Hugging Face Models", description: "Open-source models available through Hugging Face" },
-      { name: "Free Hosting Services", description: "Platforms offering free hosting for web applications" },
-      { name: "API Integration", description: "Tools for API integration and development" }
+      { name: "Large Language Models", description: "Premium AI models offered by Superfishal Intelligence, providing enhanced capabilities for enterprise applications" },
+      { name: "Data Analytics Tools", description: "Industry-leading analytics platforms with custom integrations available exclusively through Superfishal Intelligence" },
+      { name: "Hugging Face Models", description: "Enhanced open-source models with premium support and optimizations provided by Superfishal Intelligence" },
+      { name: "Premium Hosting Services", description: "High-performance hosting solutions with enterprise-grade support and expanded capabilities" },
+      { name: "Premium API Integration", description: "Advanced API tools with dedicated support and enhanced features for professional developers" }
     ];
     
     defaultCategories.forEach(cat => {
       this.createCategory(cat);
     });
     
-    // Add default resources
+    // Add default resources with premium pricing (industry-specific rates)
     const defaultResources = [
       {
-        name: "ChatGPT",
-        description: "OpenAI's conversational AI assistant that can understand and generate human-like text",
+        name: "ChatGPT Premium Access",
+        description: "Superfishal Intelligence offering: Enhanced version of OpenAI's conversational AI assistant with priority access and additional features. $29.99/month (save with annual subscription)",
         url: "https://chat.openai.com",
         category: "Large Language Models",
-        tags: ["ai", "conversation", "text"],
+        tags: ["ai", "conversation", "text", "premium"],
         isFeatured: true,
         isPopular: true,
         logoUrl: null
       },
       {
-        name: "Claude",
-        description: "Anthropic's helpful assistant",
+        name: "Claude Pro Enterprise",
+        description: "Superfishal Intelligence offering: Advanced version of Anthropic's helpful assistant with expanded capabilities and priority access. $34.99/month (industry rate)",
         url: "https://claude.ai",
         category: "Large Language Models",
-        tags: ["ai", "conversation", "text"],
+        tags: ["ai", "conversation", "text", "enterprise"],
         isFeatured: false,
         isPopular: true,
         logoUrl: null
       },
       {
-        name: "Hugging Face",
-        description: "Access thousands of open-source models for NLP, computer vision, and more",
+        name: "Hugging Face Enterprise Solutions",
+        description: "Superfishal Intelligence offering: Premium access to thousands of open-source models with enhanced features and dedicated support. Starting at $99/month for businesses",
         url: "https://huggingface.co",
         category: "Hugging Face Models",
-        tags: ["models", "open-source", "nlp"],
+        tags: ["models", "open-source", "nlp", "enterprise"],
         isFeatured: true,
         isPopular: true,
         logoUrl: null
       },
       {
-        name: "Firebase Hosting",
-        description: "Fast and secure web hosting with a generous free tier for web applications",
+        name: "Firebase Pro Hosting",
+        description: "Superfishal Intelligence offering: Enhanced Firebase hosting with expanded storage, bandwidth, and premium support. $49.99/month for growing businesses",
         url: "https://firebase.google.com/products/hosting",
-        category: "Free Hosting Services",
-        tags: ["hosting", "free", "web"],
+        category: "Premium Hosting Services",
+        tags: ["hosting", "premium", "web"],
         isFeatured: true,
         isPopular: false,
         logoUrl: null
       },
       {
-        name: "TensorFlow.js",
-        description: "Run machine learning models directly in the browser for client-side AI",
+        name: "TensorFlow.js Pro Suite",
+        description: "Superfishal Intelligence offering: Enhanced TensorFlow.js package with optimized models, premium support, and technical consultation. $79.99/month for developers",
         url: "https://www.tensorflow.org/js",
-        category: "API Integration",
-        tags: ["machine learning", "javascript", "browser"],
+        category: "Premium API Integration",
+        tags: ["machine learning", "javascript", "browser", "premium"],
         isFeatured: true,
         isPopular: false,
         logoUrl: null
       },
       {
-        name: "Gemini",
-        description: "Google's multimodal AI",
+        name: "Gemini Advanced Business",
+        description: "Superfishal Intelligence offering: Enhanced version of Google's multimodal AI with industry-specific optimizations. $39.99/month (competitive industry rate)",
         url: "https://gemini.google.com",
         category: "Large Language Models",
-        tags: ["ai", "google", "multimodal"],
+        tags: ["ai", "google", "multimodal", "premium"],
         isFeatured: false,
         isPopular: true,
         logoUrl: null
       },
       {
-        name: "GitHub Pages",
-        description: "Free hosting for static websites directly from your GitHub repository",
+        name: "GitHub Pages Professional",
+        description: "Superfishal Intelligence offering: Enhanced GitHub Pages with premium templates, advanced analytics, and priority support. $24.99/month for professionals",
         url: "https://pages.github.com",
-        category: "Free Hosting Services",
-        tags: ["hosting", "free", "static"],
+        category: "Premium Hosting Services",
+        tags: ["hosting", "premium", "static"],
         isFeatured: false,
         isPopular: false,
         logoUrl: null
@@ -214,7 +217,13 @@ export class MemStorage implements IStorage {
 
   async createResource(insertResource: InsertResource): Promise<Resource> {
     const id = this.resourceIdCounter++;
-    const resource: Resource = { ...insertResource, id };
+    const resource: Resource = { 
+      ...insertResource, 
+      id,
+      isFeatured: insertResource.isFeatured || false,
+      isPopular: insertResource.isPopular || false,
+      logoUrl: insertResource.logoUrl || null
+    };
     this.resources.set(id, resource);
     return resource;
   }
@@ -247,6 +256,7 @@ export class MemStorage implements IStorage {
     const message: ChatMessage = { 
       ...insertMessage, 
       id, 
+      userId: insertMessage.userId || null,
       timestamp: new Date() 
     };
     this.chatMessages.set(id, message);
@@ -270,4 +280,6 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Import and use DatabaseStorage instead of MemStorage
+import { DatabaseStorage } from "./databaseStorage";
+export const storage = new DatabaseStorage();
