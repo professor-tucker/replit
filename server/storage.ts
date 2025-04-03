@@ -64,7 +64,16 @@ export class MemStorage implements IStorage {
     this.categoryIdCounter = 1;
     
     // Initialize with some default categories
-    this.initializeDefaultData();
+    // We need to call this asynchronously now
+    this.loadDefaultData();
+  }
+  
+  // Helper method to initialize data in async context
+  private loadDefaultData() {
+    // Execute the async method without waiting
+    this.initializeDefaultData().catch(err => {
+      console.error("Failed to initialize default data:", err);
+    });
   }
 
   async initializeDefaultData(): Promise<void> {
