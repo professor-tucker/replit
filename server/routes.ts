@@ -4,11 +4,15 @@ import { storage } from "./storage";
 import { 
   insertResourceSchema, 
   insertChatMessageSchema, 
-  insertResourceCategorySchema 
+  insertResourceCategorySchema,
+  resources,
+  chatMessages,
+  resourceCategories 
 } from "@shared/schema";
 import { generateAIResponse, formatChatPrompt } from "./ai";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { db } from "./db";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // prefix all routes with /api
@@ -209,6 +213,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(newCategory);
     } catch (error) {
       res.status(500).json({ message: "Failed to create category" });
+    }
+  });
+  
+  // Database reset endpoint (for development purposes)
+  apiRouter.post("/api/reset-database", async (req: Request, res: Response) => {
+    try {
+      // Clear existing data
+      await db.delete(chatMessages);
+      await db.delete(resources);
+      await db.delete(resourceCategories);
+      
+      // Reinitialize with default data
+      await storage.initializeDefaultData();
+      
+      res.json({ message: "Database reset and reinitialized with affiliate links" });
+    } catch (error) {
+      console.error("Failed to reset database:", error);
+      res.status(500).json({ message: "Failed to reset database" });
     }
   });
 
