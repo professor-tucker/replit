@@ -13,20 +13,21 @@ Superfishal Intelligence is a crowd-sourcing AI platform operating on a gig-econ
 - Resource categorization and filtering
 - Responsive design with mobile support
 - Premium positioning with upcharged resources
+- AI-generated cybersecurity content
 
 ## Technology Stack
 
 - **Frontend**: React, TailwindCSS, Shadcn UI components
 - **Backend**: Express.js
 - **Database**: PostgreSQL
-- **AI Integration**: Hugging Face AI models
+- **AI Integration**: Hugging Face, Anthropic Claude, and Perplexity AI
 
 ## Development
 
 1. Clone the repository
-2. Install dependencies with `npm install`
+2. Set up project
 3. Set up environment variables
-4. Run the development server with `npm run dev`
+4. Run the development server
 
 ## Deployment
 
