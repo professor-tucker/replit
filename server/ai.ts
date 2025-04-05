@@ -19,8 +19,8 @@ export async function generateAIResponse(prompt: string): Promise<string> {
   try {
     const hfClient = getHfClient();
     
-    // Use a free, open-source model from Hugging Face
-    const modelId = 'google/flan-t5-small';
+    // Use a reliable, free model from Hugging Face
+    const modelId = 'gpt2';
     
     // Generate text from the model
     const result = await hfClient.textGeneration({
