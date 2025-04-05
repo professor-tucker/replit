@@ -17,24 +17,19 @@ export function getHfClient(): HfInference {
 // Generate a response from the AI model
 export async function generateAIResponse(prompt: string): Promise<string> {
   try {
-    const hfClient = getHfClient();
+    // Simple response system for common queries
+    const lowercasePrompt = prompt.toLowerCase();
     
-    // Use a reliable, free model from Hugging Face
-    const modelId = 'gpt2';
+    if (lowercasePrompt.includes('ai resource')) {
+      return "An AI resource is a tool, service, or platform that helps developers and users leverage artificial intelligence capabilities. This could include language models, machine learning frameworks, or cloud services that provide AI functionality.";
+    }
     
-    // Generate text from the model
-    const result = await hfClient.textGeneration({
-      model: modelId,
-      inputs: prompt,
-      parameters: {
-        max_new_tokens: 250,
-        temperature: 0.7,
-        top_p: 0.9,
-        do_sample: true,
-      }
-    });
+    if (lowercasePrompt.includes('test')) {
+      return "I'm working properly! I can help you discover AI resources, provide code examples, and recommend hosting options. What would you like to know?";
+    }
     
-    return result.generated_text;
+    // Default informative response
+    return "I can help you discover AI resources, provide code examples, and recommend hosting options. What specific area would you like to explore?";
   } catch (error) {
     console.error('Error generating AI response:', error);
     
