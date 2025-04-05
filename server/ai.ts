@@ -19,9 +19,8 @@ export async function generateAIResponse(prompt: string): Promise<string> {
   try {
     const hfClient = getHfClient();
     
-    // Use a more capable open-source model from Hugging Face
-    // This is a Llama-2 based model that's optimized for chat
-    const modelId = 'meta-llama/Llama-2-7b-chat-hf';
+    // Use a free, open-source model from Hugging Face
+    const modelId = 'google/flan-t5-small';
     
     // Generate text from the model
     const result = await hfClient.textGeneration({
